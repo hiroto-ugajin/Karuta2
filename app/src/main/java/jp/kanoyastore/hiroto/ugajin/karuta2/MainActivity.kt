@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
         R.drawable.k15
     )
 
-    private var currentIndex = 0
+//    private var currentIndex = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,11 +71,13 @@ class MainActivity : AppCompatActivity() {
         val textView = binding.text
 
         // initialMessageArrayをシャッフルしてmessageArrayを作成
-        val messageArray = initialMessageArray.toMutableList().shuffled().toTypedArray()
+        var messageArray = initialMessageArray.copyOf().apply { shuffle() }
+//        val messageArray = initialMessageArray.toMutableList().shuffled().toTypedArray()
 
         textView.textSize = 25f // ピクセル単位で指定
+        var currentIndex = 0
         textView.text = messageArray[currentIndex]
-        currentIndex = 0
+
         var correctCount = 0
 
 // 元のdrawableArrayのインデックスを保持する配列を作成する
@@ -86,6 +88,12 @@ class MainActivity : AppCompatActivity() {
 
         // ボタンのクリックリスナーでボタンのtagを取得する
         val buttonClickListener = View.OnClickListener { view ->
+
+            mediaPlayer1.reset()
+            mediaPlayer1 = MediaPlayer.create(this, R.raw.nice)
+
+            mediaPlayer2.reset()
+            mediaPlayer2 = MediaPlayer.create(this, R.raw.boo)
 
             val clickedImageIndex = view.tag as? Int ?: -1
             // インデックスを使って必要な処理を行う
@@ -107,6 +115,7 @@ class MainActivity : AppCompatActivity() {
 
                     textView.text = "16問中${correctCount}問正解"
                     correctCount = 0
+                    currentIndex = 0
 
                     // currentIndexを増やすという部分の下に以下のコードを追加
                     for (i in 0 until shuffledDrawableArray.size) {
@@ -133,6 +142,7 @@ class MainActivity : AppCompatActivity() {
 
                     textView.text = "16問中${correctCount}問正解"
                     correctCount = 0
+                    currentIndex = 0
 
                     // currentIndexを増やすという部分の下に以下のコードを追加
                     for (i in 0 until shuffledDrawableArray.size) {
@@ -155,13 +165,16 @@ class MainActivity : AppCompatActivity() {
 
         // リセット処理を行う関数
         fun resetGame() {
-            currentIndex = 0
-            correctCount = 0
+
 
             val shuffledDrawableArray = drawableArray.clone().apply {
                 shuffle()
             }
-            val messageArray = initialMessageArray.toMutableList().shuffled().toTypedArray()
+             messageArray = messageArray.copyOf().apply { shuffle() }
+//                initialMessageArray.toMutableList().shuffled().toTypedArray()
+
+            currentIndex = 0
+            correctCount = 0
             val textView = binding.text
             textView.text = messageArray[currentIndex]
 
@@ -180,6 +193,8 @@ class MainActivity : AppCompatActivity() {
 
                 imageButton.alpha = 1.0f
                 imageButton.isEnabled = true
+
+
             }
         }
 
@@ -196,6 +211,9 @@ class MainActivity : AppCompatActivity() {
             val drawableIndex = drawableArray.indexOf(shuffledDrawableArray[i])
             imageButton.setImageResource(shuffledDrawableArray[i])
             imageButton.tag = drawableIndex
+
+            imageButton.alpha = 1.0f
+            imageButton.isEnabled = true
 
             imageButton.setOnClickListener(buttonClickListener) // リスナーを設定する
         }
